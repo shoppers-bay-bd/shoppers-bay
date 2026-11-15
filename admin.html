@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shoppers Bay | Admin Dashboard</title>
+<style>
+:root{--navy:#102d66;--orange:#f47700;--bg:#f4f6fa;--line:#e2e7ef;--muted:#687386}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#172033;font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+header{background:var(--navy);color:white;padding:17px 16px;border-bottom:4px solid var(--orange)}
+.wrap{max-width:1000px;margin:auto;padding:16px}.head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-size:21px;margin:0}h2{font-size:19px;margin:0 0 14px}.muted{color:var(--muted);font-size:13px}
+.tabs{display:flex;gap:8px;overflow:auto;margin:16px 0}.tabs button{white-space:nowrap}
+button{border:0;border-radius:9px;padding:10px 13px;background:var(--orange);color:white;font-weight:700;cursor:pointer}
+button.secondary{background:#e8edf6;color:var(--navy)}button.danger{background:#b42318}
+.card{background:white;border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}.stat b{display:block;font-size:23px;color:var(--navy)}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d5dce7;border-radius:9px;font:inherit;margin:6px 0 12px;background:white}
+label{font-size:13px;font-weight:700}table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:9px;border-bottom:1px solid var(--line);vertical-align:middle}
+.thumb{width:48px;height:48px;object-fit:cover;border-radius:8px;background:#eef1f5}.actions{display:flex;gap:6px;flex-wrap:wrap}
+.notice{background:#fff4e8;border:1px solid #ffd6ad;color:#794000;border-radius:10px;padding:12px;font-size:13px;line-height:1.6}
+.hidden{display:none}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.formgrid,.grid{grid-template-columns:1fr}table{min-width:590px}.tablewrap{overflow:auto}}
+</style></head>
+<body>
+<header><div class="wrap head"><div><h1>Shoppers Bay — Admin</h1><div style="font-size:12px;opacity:.8">পণ্য ও অর্ডার ব্যবস্থাপনা</div></div><a href="index.html" style="color:white">স্টোর দেখুন ↗</a></div></header>
+<main class="wrap">
+<div class="notice"><b>গুরুত্বপূর্ণ সীমাবদ্ধতা:</b> এটি এখন একটি প্রাথমিক ড্যাশবোর্ড। পণ্যের পরিবর্তন এই ফোনের এই ব্রাউজারেই সেভ হবে; অন্য ক্রেতাদের ফোনে বা লাইভ ওয়েবসাইটে নিজে থেকে আপডেট হবে না। WhatsApp-এ আসা অর্ডার এখানে স্বয়ংক্রিয়ভাবে আসবে না—ম্যানুয়ালি যোগ করতে হবে। সবার জন্য লাইভ করতে নিরাপদ সার্ভার/ডেটাবেস ও অ্যাডমিন লগইন যুক্ত করতে হবে।</div>
+<div class="grid" style="margin-top:14px">
+<div class="stat"><span class="muted">মোট পণ্য</span><b id="productCount">0</b></div>
+<div class="stat"><span class="muted">ম্যানুয়ালি নথিভুক্ত অর্ডার</span><b id="orderCount">0</b></div>
+</div>
+<div class="tabs">
+<button onclick="tab('products')">পণ্য ব্যবস্থাপনা</button>
+<button class="secondary" onclick="tab('orders')">অর্ডার ব্যবস্থাপনা</button>
+<button class="secondary" onclick="tab('backup')">ব্যাকআপ</button>
+</div>
+<section id="productsTab">
+<div class="card"><h2 id="formTitle">নতুন পণ্য যোগ করুন</h2>
+<form id="productForm">
+<input type="hidden" id="pid">
+<div class="formgrid">
+<div><label>পণ্যের নাম</label><input id="pname" required placeholder="যেমন: চাল ৫ কেজি"></div>
+<div><label>ক্যাটাগরি</label><select id="pcat"><option>গ্রোসারি</option><option>ফ্যাশন</option><option>ইলেকট্রনিকস</option><option>বিউটি</option><option>হোম & লিভিং</option><option>অন্যান্য</option></select></div>
+<div><label>বিক্রয়মূল্য (৳)</label><input id="pprice" type="number" min="0" required placeholder="500"></div>
+<div><label>ইমোজি (ছবি না দিলে)</label><input id="pemoji" value="🛍️" maxlength="8"></div>
+</div>
+<label>পণ্যের ছবির URL (ঐচ্ছিক)</label><input id="pimage" type="url" placeholder="https://...">
+<label>বিবরণ</label><textarea id="pdesc" rows="2" placeholder="পণ্যের বিবরণ"></textarea>
+<div class="actions"><button type="submit">সেভ করুন</button><button type="button" class="secondary" onclick="resetForm()">ফর্ম পরিষ্কার</button></div>
+</form></div>
+<div class="card"><h2>পণ্যের তালিকা</h2><div class="tablewrap"><table><thead><tr><th>পণ্য</th><th>ক্যাটাগরি</th><th>দাম</th><th>কাজ</th></tr></thead><tbody id="productRows"></tbody></table></div></div>
+</section>
+<section id="ordersTab" class="hidden">
+<div class="card"><h2>নতুন অর্ডার নথিভুক্ত করুন</h2><form id="orderForm">
+<div class="formgrid"><div><label>ক্রেতার নাম</label><input id="oname" required></div><div><label>মোবাইল</label><input id="ophone" required></div></div>
+<label>অর্ডারের বিবরণ</label><textarea id="odetail" required placeholder="পণ্যের নাম, পরিমাণ, মোট টাকা"></textarea>
+<label>ডেলিভারি ঠিকানা</label><textarea id="oaddress" required></textarea>
+<label>অবস্থা</label><select id="ostatus"><option>নতুন</option><option>নিশ্চিত</option><option>প্যাকিং</option><option>ডেলিভারিতে</option><option>সম্পন্ন</option><option>বাতিল</option></select>
+<button type="submit">অর্ডার সেভ করুন</button></form></div>
+<div class="card"><h2>অর্ডারের তালিকা</h2><div class="tablewrap"><table><thead><tr><th>তারিখ</th><th>ক্রেতা</th><th>ফোন</th><th>বিবরণ</th><th>অবস্থা</th><th>কাজ</th></tr></thead><tbody id="orderRows"></tbody></table></div></div>
+</section>
+<section id="backupTab" class="hidden"><div class="card"><h2>ডেটা ব্যাকআপ</h2><p class="muted">এই ব্রাউজারে থাকা পণ্য ও ম্যানুয়াল অর্ডার JSON ফাইলে ডাউনলোড বা পুনরায় আপলোড করতে পারবে।</p><div class="actions"><button onclick="backup()">ব্যাকআপ ডাউনলোড</button><label class="secondary" style="padding:10px;border-radius:9px;cursor:pointer">ব্যাকআপ আপলোড <input type="file" accept="application/json" onchange="restore(event)" style="display:none"></label></div></div></section>
+</main>
+<script>
+const defaults=[
+{id:1,name:"প্রিমিয়াম চাল (৫ কেজি)",cat:"গ্রোসারি",price:420,emoji:"🍚",desc:"নমুনা পণ্য — প্রকৃত দাম বসান"},
+{id:2,name:"সরিষার তেল (১ লিটার)",cat:"গ্রোসারি",price:220,emoji:"🫙",desc:"নমুনা পণ্য — প্রকৃত দাম বসান"},
+{id:3,name:"ক্যাজুয়াল টি-শার্ট",cat:"ফ্যাশন",price:350,emoji:"👕",desc:"সাইজ ও রং নিশ্চিত করুন"},
+{id:4,name:"ওয়্যারলেস ইয়ারবাড",cat:"ইলেকট্রনিকস",price:890,emoji:"🎧",desc:"নমুনা পণ্য — প্রকৃত দাম বসান"},
+{id:5,name:"স্কিন কেয়ার সেট",cat:"বিউটি",price:650,emoji:"🧴",desc:"নমুনা পণ্য — প্রকৃত দাম বসান"},
+{id:6,name:"পানির বোতল",cat:"হোম & লিভিং",price:180,emoji:"🥤",desc:"নমুনা পণ্য — প্রকৃত দাম বসান"}];
+let products=JSON.parse(localStorage.getItem("sb_products")||"null")||defaults;
+let orders=JSON.parse(localStorage.getItem("sb_orders")||"[]");
+const money=n=>"৳"+Number(n||0).toLocaleString("en-US");
+function save(){localStorage.setItem("sb_products",JSON.stringify(products));localStorage.setItem("sb_orders",JSON.stringify(orders));draw()}
+function draw(){
+document.getElementById("productCount").textContent=products.length;document.getElementById("orderCount").textContent=orders.length;
+document.getElementById("productRows").innerHTML=products.map(p=>`<tr><td>${p.image?`<img class="thumb" src="${p.image}">`:p.emoji||"🛍️"} ${p.name}</td><td>${p.cat}</td><td>${money(p.price)}</td><td><div class="actions"><button class="secondary" onclick="editProduct(${p.id})">এডিট</button><button class="danger" onclick="delProduct(${p.id})">মুছুন</button></div></td></tr>`).join("");
+document.getElementById("orderRows").innerHTML=orders.map(o=>`<tr><td>${o.date}</td><td>${o.name}</td><td>${o.phone}</td><td>${o.detail}<br>${o.address}</td><td><select onchange="status(${o.id},this.value)">${["নতুন","নিশ্চিত","প্যাকিং","ডেলিভারিতে","সম্পন্ন","বাতিল"].map(x=>`<option ${x===o.status?"selected":""}>${x}</option>`).join("")}</select></td><td><button class="danger" onclick="delOrder(${o.id})">মুছুন</button></td></tr>`).join("");
+}
+function tab(t){["products","orders","backup"].forEach(x=>document.getElementById(x+"Tab").classList.toggle("hidden",x!==t))}
+function resetForm(){document.getElementById("productForm").reset();document.getElementById("pid").value="";document.getElementById("pemoji").value="🛍️";document.getElementById("formTitle").textContent="নতুন পণ্য যোগ করুন"}
+function editProduct(id){let p=products.find(x=>x.id===id);if(!p)return;pid.value=p.id;pname.value=p.name;pcat.value=p.cat;pprice.value=p.price;pemoji.value=p.emoji||"🛍️";pimage.value=p.image||"";pdesc.value=p.desc||"";formTitle.textContent="পণ্য পরিবর্তন করুন";window.scrollTo({top:0,behavior:"smooth"})}
+function delProduct(id){if(confirm("পণ্যটি মুছে ফেলবে?")){products=products.filter(p=>p.id!==id);save()}}
+document.getElementById("productForm").addEventListener("submit",e=>{e.preventDefault();let id=Number(pid.value)||Date.now();let p={id,name:pname.value.trim(),cat:pcat.value,price:Number(pprice.value),emoji:pemoji.value||"🛍️",image:pimage.value.trim(),desc:pdesc.value.trim()};let i=products.findIndex(x=>x.id===id);if(i>=0)products[i]=p;else products.unshift(p);save();resetForm();alert("পণ্য সেভ হয়েছে।")});
+document.getElementById("orderForm").addEventListener("submit",e=>{e.preventDefault();orders.unshift({id:Date.now(),date:new Date().toLocaleDateString("bn-BD"),name:oname.value,phone:ophone.value,detail:odetail.value,address:oaddress.value,status:ostatus.value});save();e.target.reset();alert("অর্ডার নথিভুক্ত হয়েছে।")});
+function status(id,v){let o=orders.find(x=>x.id===id);if(o){o.status=v;save()}}
+function delOrder(id){if(confirm("অর্ডারটি মুছে ফেলবে?")){orders=orders.filter(o=>o.id!==id);save()}}
+function backup(){let blob=new Blob([JSON.stringify({products,orders},null,2)],{type:"application/json"});let a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="shoppers-bay-backup.json";a.click();URL.revokeObjectURL(a.href)}
+function restore(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d.products)||!Array.isArray(d.orders))throw Error();products=d.products;orders=d.orders;save();alert("ব্যাকআপ পুনরুদ্ধার হয়েছে।")}catch(x){alert("ফাইলটি সঠিক ব্যাকআপ নয়।")}};r.readAsText(f)}
+draw();
+</script></body></html>
